@@ -136,16 +136,16 @@ public class CompilerUI extends javax.swing.JFrame {
     
     private void syntaticAnalysis() {
         Grammar gramatica = new Grammar(tokens, errors);
-
+        
         /* Eliminación de errores */
         gramatica.delete(new String[]{"ERROR", "ERROR_1", "ERROR_2"}, 1);
         gramatica.group("VALOR", "NUMERO | COLOR");
-
+        
         gramatica.group("VARIABLE", "TIPO_DATO IDENTIFICADOR OPDEASIGNASION VALOR", true, identProd);
         gramatica.group("VARIABLE", "IDENTIFICADOR OPDEASIGNACION VALOR", true, 
                 2, "Error Sintatico {} Falta el tipo de dato en la variable [#,%]");
         gramatica.finalLineColumn();
-
+        
         gramatica.group("VARIABLE", "TIPO_DATO OPDEASIGNACION VALOR", true,
                 3, "Error Sintatico {} Falta el identificador en la variable [#,%]");
         gramatica.finalLineColumn();
@@ -270,9 +270,9 @@ public class CompilerUI extends javax.swing.JFrame {
                 String strERROR = String.valueOf(error);
                 strErrors += strERROR + "\n";
             }
-            textAreaResult.setText("Compilacion Terminada... \n" + strErrors + "\n La Compilacion termino con errores...");
+            textAreaResult.setText("Compilación terminada... \n" + strErrors + "\n La compilación terminó con errores...");
         } else {
-            textAreaResult.setText("¡Compilacion exitosa!");
+            textAreaResult.setText("¡Compilación exitosa!");
         }
         textAreaResult.setCaretPosition(0);
     }
@@ -565,7 +565,7 @@ public class CompilerUI extends javax.swing.JFrame {
             if (!errors.isEmpty()){
             JOptionPane.showMessageDialog(null, "No se puede ejecutar el codigo ya que se encontro uno o mas errores",
                     "Error en la compilación", JOptionPane.ERROR_MESSAGE);
-        }else {
+        } else {
                 CodeBlock codeBlock = Functions.splitCodeInCodeBlocks(tokens, "{", "}", ";");
                 System.out.println(codeBlock);
                 ArrayList<String> blockOfCode = codeBlock.getBlocksOfCodeInOrderOfExec();

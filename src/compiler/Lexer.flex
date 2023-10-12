@@ -15,7 +15,7 @@ import compilerTools.Token;
 /*Variables basicas de comentarios y espacios*/
 TerminadorDeLinea = \r|\n|\r\n
 EntradaDeCaracter = [^\r\n]
-EspaciosEnBlanco = {TerminadorDeLinea} | [\t\f]
+EspaciosEnBlanco = {TerminadorDeLinea} | [\t\f] | " "
 ComentarioTradicional = "/*" [^*] ~"*/" | "/*" "*"+ "/"
 FinDeLineaComentario = "//" {EntradaDeCaracter}* {TerminadorDeLinea}?
 ContenidoComentario = ([^*] | \*+ [^/*])*

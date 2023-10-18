@@ -113,7 +113,7 @@ public class CompilerUI extends javax.swing.JFrame {
             BufferedReader entrada = new BufferedReader (new InputStreamReader (new FileInputStream (codigo),"UTF8"));
             lexer = new Lexer(entrada);
             while(true){
-                Token token =lexer.yylex();
+                Token token = lexer.yylex();
                 if (token == null){
                     break;
                 }
@@ -137,112 +137,122 @@ public class CompilerUI extends javax.swing.JFrame {
     private void syntaticAnalysis() {
         Grammar gramatica = new Grammar(tokens, errors);
         
-        /* Eliminación de errores */
+        /* Eliminacion de errores */
         gramatica.delete(new String[]{"ERROR", "ERROR_1", "ERROR_2"}, 1);
         gramatica.group("VALOR", "NUMERO | COLOR");
         
-        gramatica.group("VARIABLE", "TIPO_DATO IDENTIFICADOR OPDEASIGNASION VALOR", true, identProd);
+        gramatica.group("VARIABLE", "TIPO_DATO IDENTIFICADOR OPDEASIGNACION VALOR", true, identProd);
         gramatica.group("VARIABLE", "IDENTIFICADOR OPDEASIGNACION VALOR", true, 
-                2, "Error Sintatico {} Falta el tipo de dato en la variable [#,%]");
+                2, "Error Sintáctico {} Falta el tipo de dato en la variable [#,%]");
+        
         gramatica.finalLineColumn();
         
         gramatica.group("VARIABLE", "TIPO_DATO OPDEASIGNACION VALOR", true,
-                3, "Error Sintatico {} Falta el identificador en la variable [#,%]");
+                3, "Error Sintáctico {} : Falta del Identificador en la variable [#,%]");
+        
         gramatica.finalLineColumn();
-
+        
         gramatica.group("VARIABLE", "TIPO_DATO IDENTIFICADOR VALOR", true,
-                4, "Error Sintatico {} Falta el operador de asignación en la variable [#,%]");
+                4, "Error Sintáctico {} : Falta el operador de asignación en la variable [#,%]");
+        
         gramatica.finalLineColumn();
-
+        
         gramatica.group("VARIABLE", "TIPO_DATO IDENTIFICADOR OPDEASIGNACION", true,
-                5, "Error Sintatico {} Falta el valor en la variable [#,%]");
+                5, "Error Sintáctico {} : Falta el valor en la variable [#,%]");
+        
         gramatica.initialLineColumn();
         gramatica.finalLineColumn();
-
-        /* Eliminación de tipos de datos y operadores de asignación */
+        
+        /* Eliminacion de tipo de datos y operadores de asignacion*/
+        
         gramatica.delete("TIPO_DATO", 7,
-                    "Error Sintatico {} : El tipo de dato no está en una declaracion [#,%]");
+                "Error Sintáctico {} : El tipo de dato no esta en una declaración [#,%]");
         gramatica.delete("OPDEASIGNACION", 8,
-                    "Error Sintatico {} : El operador de asignación no está en una declaracion [#,%]");
-
-        /* Agrupar identificadores y definición de parámetros */
+                "Error Sintáctico {} : El operador de asignación no esta en una declaración [#,%]");
+        
+        /* Agrupar identificadores y definicion de parametros*/
+        gramatica.group("VALOR", "IDENTIFICADOR", true);
         gramatica.group("PARAMETROS", "VALOR (COMA VALOR)+");
-        gramatica.group("FUNCION", "PALABRA_RESERVADA | PINTAR | DETENER_PINTAR | REPETIR | DETENER_REPETIR | ESTRUCTURA_SI", true);
-        gramatica.group("FUNCION_COMP", "FUNCION_PARENTESIS_A (VALOR | PARAMETROS)? PARENTESIS_C", true);
-        gramatica.group("FUNCION_COMP", "FUNCION (VALOR | PARAMETROS)? PARENTESIS_C", true, 
-                9,"Error Sintatico {} : Falta el paréntesis que abre la funcion[#,%]");
-
+        gramatica.group("FUNCION", "PALABRA_RESERVADA | PINTAR | DETENER_PINTAR | REPETIR | TOMAR | MOVIMIENTO | LANZARMONEDA | VER | DETENER_REPETIR | ESTRUCTURA_SI", true);
+        gramatica.group("FUNCION_COMP", "FUNCION PARENTESIS_A (VALOR | PARAMETROS)? PARENTESIS_C", true);
+        gramatica.group("FUNCION_COMP", "FUNCION (VALOR | PARAMETROS)? PARENTESIS_C", true,
+                9, "ERROR Sintactico {} : Falata el parentesis que abre la funcion [#,%]");
+        
         gramatica.finalLineColumn();
-        gramatica.group("FUNCION_COMP", "FUNCION PARENTESIS_A (VALOR | PARAMETROS)?", true,
-                10, "Error Sintatico {} : Falta el paréntesis de cierre de la funcion [#,%]");
-        gramatica.finalLineColumn();
-
-        /* Eliminación de funciones incompletas */ 
-        gramatica.delete("FUNCION", 11,
-                "Error Sintatico {} : La función no está declarada correctamente [#,%]");
+        gramatica.group("FUNCION_COMP", "FUNCION PARENTESIS_A (VALOR | PARAMETROS)", true,
+                10, "ERROR Sintactico {} : Falta el parentesis de cierre de la funcion [#,%]");
+        gramatica.initialLineColumn();
+        
+        /* Eliminacion de funciones incompletas*/
+        
+        gramatica.delete("FUNCION", 11, "Error sintactico {} : La funcion no esta declarada correctamente [#,%]");
+        
         gramatica.loopForFunExecUntilChangeNotDetected(()-> {
             gramatica.group("EXP_LOGICA", "(FUNCION_COMP | EXP_LOGICA) (OPERADOR_LOGICO(FUNCION_COMP | EXP_LOGICA))+");
             gramatica.group("EXP_LOGICA", "PARENTESIS_A (EXP_LOGICA | FUNCION_COMP) PARENTESIS_C");
         });
-
-        /* Eliminación de un operador lógico */
-        gramatica.delete("OPERADOR_LOGICO", 12,
-                "Error Sintatico {} : El operador lógico no  está contenido en una expresión");
-
-        /*Agrupación de expresiones lógicas */
-        gramatica.group("VALOR",  "EXP_LOGICA");
+        /* Eliminacion de un operador logico*/
+        gramatica.delete("OPERADOR_LOGICO", 12, "Error Sintactico {} : El operador logico no esta contenido en una expresion");
+        
+        /* Agrupacion de expresiones logicas */
+        gramatica.group("VALOR", "EXP_LOGICA");
         gramatica.group("PARAMETROS", "VALOR (COMA VALOR)+");
-
-        /* Agrupación de estructuras de control */
+        
+        /* Agrupacion de estructuras de control*/
+        
         gramatica.group("EST_CONTROL", "REPETIR | ESTRUCTURA_SI");
         gramatica.group("EST_CONTROL_COMP", "EST_CONTROL PARENTESIS_A PARENTESIS_C");
         gramatica.group("EST_CONTROL_COMP", "EST_CONTROL (VALOR | PARAMETROS)");
-        gramatica.group("EST_CONTROL_COMP", "EST_CONTROL PARENTESIS_A | (VALOR | PARAMETROS) PARENTESIS_C");
-
-        /* Eliminación de estructuras de control incompletas */
-        gramatica.delete("EST_CONTROL", 13,
-                "Error Sintatico {} : La estructura de control no está declarada correctamente [#,%]");
-
-        /* Eliminación de paréntesis */
+        gramatica.group("EST_CONTROL_COMP", "EST_CONTROL PARENTESIS_A (VALOR | PARAMETROS) PARENTESIS_C");
+        
+        
+        /* Eliminacion de estructuras de control incompletas */
+        
+        gramatica.delete("EST_CONTROL", 13, "Error Sintactico {} : La estructura de control no esta declarada correctamente [#,%]");
+        
+        
+        /* Eliminacion de parentesis  */
         gramatica.delete(new String [] {"PARENTESIS_A", "PARENTESIS_C"},
-                14, "Error Sintatico {} : El paréntesis [] no está declarado correctamente [#,%]");
+                14, "Error sintactico {} : El parentesis [] no esta declarado correctamente [#,%]");
         gramatica.finalLineColumn();
-
-        /* Verificación de punto y coma */
+        
+        /* verificacion de punto y coma */
         gramatica.group("VARIABLE_PC", "VARIABLE PUNTOYCOMA");
         gramatica.group("VARIABLE_PC", "VARIABLE", true,
-                15, "Error Sintatico {} : Falta el punto y coma [] al final de la variable [#,%]");
-
+                15, "Error sintactico {} : Falta el punto y coma [] al final de la variable [#,%]");
+        
         /* Funciones */
         gramatica.group("FUNCION_COMP_PC", "FUNCION_COMP PUNTOYCOMA");
         gramatica.group("FUNCION_COMP_PC", "FUNCION_COMP",
-                16, "Error Sintatico {} : Falta el punto y coma [] de la declaracion de la función");
-
-        /* Eliminar punto y coma */
-        gramatica.delete("PUNTOYCOMA",
-                17, "Errir Sintatico {} : El punto y coma no esta al final de una sentencia");
-
+                16, "Error Sintactico {} : Falta el punto y coma [] de la declaracion de la funcion [#,%]");
+        gramatica.initialLineColumn();
+        
+        //eliminar el punto y coma//
+        gramatica.delete("PUNTOYCOMA", 
+                17, "Error Sintactico {} : El punto y coma no esta al final de una sentencia [#,%]");
+        
         /* Sentencias */
-        gramatica.group("SENTENCIAS", "(VARIABLE_PC | FUNCION_COMP_PC)+");
+        
+        gramatica.group("SENTENCIAS", "(VARIABLE_PC | FUNCION_COMP_PC)+", true);
         gramatica.loopForFunExecUntilChangeNotDetected(()-> {
-            gramatica.group("EST_CONTROL_COMP_LASLC",
-                    "EST_CONTROL_COMP LLAVE_A (SENTENCIAS)? LLAVE_C", true);
-            gramatica.group("SENTENCIAS", ("(SENTENCIAS | EST_CONTROL_COMP_LASLC)+"));
+            gramatica.group("EST_CONTROL_COMP_LASLC", "EST_CONTROL_COMP LLAVE_A (SENTENCIAS)? LLAVE_C", true);
+            gramatica.group("SENTENCIAS", "(SENTENCIAS | EST_CONTROL_COMP)+");
         });
-
-        /*Estructura de una función incompleta*/
-        gramatica.loopForFunExecUntilChangeNotDetected(()-> {
+        
+        /* Estructura de funcion incompleta */
+        gramatica.loopForFunExecUntilChangeNotDetected(() -> {
             gramatica.initialLineColumn();
             gramatica.group("EST_CONTROL_COMP_LASLC", "EST_CONTROL_COMP (SENTENCIAS)? LLAVE_C", true,
-                    18, "Error Sintatico {} : Falta la llave que abre en la estructura de control [#,%]");
+                    18, "Error Sintactico {} : Falta la llave que abre en la estructura de control [#,%]");
             gramatica.finalLineColumn();
-            gramatica.group("EST_CONTROL_COMP", "EST_CONTROL_COMP LLAVE_A (SENTENCIAS)?", true,
-                    19,"Error Sintatico {} : Falta la llave que cierra en la estructura de control [#,%]");
-            gramatica.group("SENTENCIAS", "(SENTENCIAS | EST_CONTROL_COMP_LASLC)");
+            gramatica.group("EST_CONTROL_LASLC", "EST_CONTROL_COMP LLAVE_A (SENTENCIAS)?", true,
+                    19, "Error Sintactico {} : Falta la llave que cierra en la estructura de control [#,%]");
+            gramatica.group("SENTENCIAS", "(SENTENCIAS | EST_CONTROL_COMP_LASLC");
         });
-
-        gramatica.delete(new String[] {"LLAVE_A", "LLAVE_C"}, 20,
-                "Error Sintatico {} la llave [] no esta contenida en una agrupacion [#,%]");
+        
+        //gramatica.delete(new String[]{"LLAVE_A", "LLAVE_C"}, 20,
+                //"Error Sintactico {} : la llave [] no esta contenida en una agrupacion [#,%]");
+        
         gramatica.show();
     }
     
@@ -252,9 +262,9 @@ public class CompilerUI extends javax.swing.JFrame {
         identDataType.put("numero", "NUMERO");
         for (Production id: identProd){
             if (!identDataType.get(id.lexemeRank(0)).equals(id.lexicalCompRank(-1))) {
-                errors.add(new ErrorLSSL(1, "Error Semantico {} : Valor No Compatible con el tipo de dato[#, %]", id, true));
-            }else if(id.lexicalCompRank(-1).equals("COLOR") && !id.lexemeRank(-1).matches("[0-9a-fA-F]+")){
-                errors.add(new ErrorLSSL(1, "Error Semantico {} : El Color no es un numero Hexadecimal [#, %]", id, false));
+                errors.add(new ErrorLSSL(1, "Error Semántico {} : Valor no compatible con el tipo de dato[#, %]", id, true));
+            }else if(!id.lexicalCompRank(-1).equals("COLOR") && !id.lexemeRank(-1).matches("#[0-9a-fA-F]+")){
+                errors.add(new ErrorLSSL(1, "Error Semántico {} : El Color no es un número Hexadecimal [#, %]", id, false));
             }else{
                 identificadores.put(id.lexemeRank(1), id.lexemeRank(-1));
             }
@@ -563,7 +573,7 @@ public class CompilerUI extends javax.swing.JFrame {
         btnCompiler.doClick();
         if (codeHasBeenCompiled) {
             if (!errors.isEmpty()){
-            JOptionPane.showMessageDialog(null, "No se puede ejecutar el codigo ya que se encontro uno o mas errores",
+            JOptionPane.showMessageDialog(null, "No se puede ejecutar el codigo ya que se encontró uno o mas errores",
                     "Error en la compilación", JOptionPane.ERROR_MESSAGE);
         } else {
                 CodeBlock codeBlock = Functions.splitCodeInCodeBlocks(tokens, "{", "}", ";");

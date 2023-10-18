@@ -1,1 +1,10 @@
-numero $miguel --> 12345;
+color $azul -->#FF00F0;
+repetir ( 4 );{
+	repetirMientras (5);{
+		derecha ( );
+	}
+		izquierda( ) ;
+
+}
+color $azul --> #FFFFFF;
+adelante () ;

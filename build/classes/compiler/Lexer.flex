@@ -79,7 +79,8 @@ Do |
 For |
 Else |
 If |
-Int { return token(yytext(), "PALABRA_RESERVADA", yyline, yycolumn); }
+Int |
+switch { return token(yytext(), "PALABRA_RESERVADA", yyline, yycolumn); }
 
 /* Pintar */
 pintar { return token(yytext(), "PINTAR", yyline, yycolumn); }

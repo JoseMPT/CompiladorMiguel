@@ -166,7 +166,7 @@ public class CompilerUI extends javax.swing.JFrame {
         /* Eliminacion de tipo de datos y operadores de asignacion*/
         
         gramatica.delete("TIPO_DATO", 7,
-                "Error Sintáctico {} : El tipo de dato no esta en una declaración [#,%]");
+                "Error Sintáctico {} : El tipo de dato no está en una declaración [#,%]");
         gramatica.delete("OPDEASIGNACION", 8,
                 "Error Sintáctico {} : El operador de asignación no esta en una declaración [#,%]");
         
@@ -176,23 +176,23 @@ public class CompilerUI extends javax.swing.JFrame {
         gramatica.group("FUNCION", "PALABRA_RESERVADA | PINTAR | DETENER_PINTAR | REPETIR | TOMAR | MOVIMIENTO | LANZARMONEDA | VER | DETENER_REPETIR | ESTRUCTURA_SI", true);
         gramatica.group("FUNCION_COMP", "FUNCION PARENTESIS_A (VALOR | PARAMETROS)? PARENTESIS_C", true);
         gramatica.group("FUNCION_COMP", "FUNCION (VALOR | PARAMETROS)? PARENTESIS_C", true,
-                9, "ERROR Sintactico {} : Falata el parentesis que abre la funcion [#,%]");
+                9, "ERROR Sintáctico {} : Falta el paréntesis que abre la función [#,%]");
         
         gramatica.finalLineColumn();
         gramatica.group("FUNCION_COMP", "FUNCION PARENTESIS_A (VALOR | PARAMETROS)", true,
-                10, "ERROR Sintactico {} : Falta el parentesis de cierre de la funcion [#,%]");
+                10, "ERROR Sintáctico {} : Falta el parántesis de cierre de la función [#,%]");
         gramatica.initialLineColumn();
         
         /* Eliminacion de funciones incompletas*/
         
-        gramatica.delete("FUNCION", 11, "Error sintactico {} : La funcion no esta declarada correctamente [#,%]");
+        gramatica.delete("FUNCION", 11, "Error Sintáctico {} : La función no está declarada correctamente [#,%]");
         
         gramatica.loopForFunExecUntilChangeNotDetected(()-> {
             gramatica.group("EXP_LOGICA", "(FUNCION_COMP | EXP_LOGICA) (OPERADOR_LOGICO(FUNCION_COMP | EXP_LOGICA))+");
             gramatica.group("EXP_LOGICA", "PARENTESIS_A (EXP_LOGICA | FUNCION_COMP) PARENTESIS_C");
         });
         /* Eliminacion de un operador logico*/
-        gramatica.delete("OPERADOR_LOGICO", 12, "Error Sintactico {} : El operador logico no esta contenido en una expresion");
+        gramatica.delete("OPERADOR_LOGICO", 12, "Error Sintáctico {} : El operador lógico no está contenido en una expresión");
         
         /* Agrupacion de expresiones logicas */
         gramatica.group("VALOR", "EXP_LOGICA");
@@ -208,28 +208,28 @@ public class CompilerUI extends javax.swing.JFrame {
         
         /* Eliminacion de estructuras de control incompletas */
         
-        gramatica.delete("EST_CONTROL", 13, "Error Sintactico {} : La estructura de control no esta declarada correctamente [#,%]");
+        gramatica.delete("EST_CONTROL", 13, "Error Sintáctico {} : La estructura de control no está declarada correctamente [#,%]");
         
         
         /* Eliminacion de parentesis  */
         gramatica.delete(new String [] {"PARENTESIS_A", "PARENTESIS_C"},
-                14, "Error sintactico {} : El parentesis [] no esta declarado correctamente [#,%]");
+                14, "Error Sintáctico {} : El paréntesis [] no está declarado correctamente [#,%]");
         gramatica.finalLineColumn();
         
         /* verificacion de punto y coma */
         gramatica.group("VARIABLE_PC", "VARIABLE PUNTOYCOMA");
         gramatica.group("VARIABLE_PC", "VARIABLE", true,
-                15, "Error sintactico {} : Falta el punto y coma [] al final de la variable [#,%]");
+                15, "Error Sintáctico {} : Falta el punto y coma [] al final de la variable [#,%]");
         
         /* Funciones */
         gramatica.group("FUNCION_COMP_PC", "FUNCION_COMP PUNTOYCOMA");
         gramatica.group("FUNCION_COMP_PC", "FUNCION_COMP",
-                16, "Error Sintactico {} : Falta el punto y coma [] de la declaracion de la funcion [#,%]");
+                16, "Error Sintáctico {} : Falta el punto y coma [] de la declaración de la función [#,%]");
         gramatica.initialLineColumn();
         
         //eliminar el punto y coma//
         gramatica.delete("PUNTOYCOMA", 
-                17, "Error Sintactico {} : El punto y coma no esta al final de una sentencia [#,%]");
+                17, "Error Sintáctico {} : El punto y coma no está al final de una sentencia [#,%]");
         
         /* Sentencias */
         
@@ -243,10 +243,10 @@ public class CompilerUI extends javax.swing.JFrame {
         gramatica.loopForFunExecUntilChangeNotDetected(() -> {
             gramatica.initialLineColumn();
             gramatica.group("EST_CONTROL_COMP_LASLC", "EST_CONTROL_COMP (SENTENCIAS)? LLAVE_C", true,
-                    18, "Error Sintactico {} : Falta la llave que abre en la estructura de control [#,%]");
+                    18, "Error Sintáctico {} : Falta la llave que abre en la estructura de control [#,%]");
             gramatica.finalLineColumn();
             gramatica.group("EST_CONTROL_LASLC", "EST_CONTROL_COMP LLAVE_A (SENTENCIAS)?", true,
-                    19, "Error Sintactico {} : Falta la llave que cierra en la estructura de control [#,%]");
+                    19, "Error Sintáctico {} : Falta la llave que cierra en la estructura de control [#,%]");
             gramatica.group("SENTENCIAS", "(SENTENCIAS | EST_CONTROL_COMP_LASLC");
         });
         

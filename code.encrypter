@@ -1,10 +1,11 @@
-color $azul -->#FF00F0;
-repetir ( 4 );{
-	repetirMientras (5);{
-		derecha ( );
-	}
-		izquierda( ) ;
+color {
+    $cesar --> #FFFFFF
+};
 
-}
-color $azul --> #FFFFFF;
-adelante () ;
+If(5, 7);
+
+lanzarMoneda(repetir(4)){
+
+} color {
+    $cesar --> 5
+};
